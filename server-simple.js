@@ -73,7 +73,7 @@ app.get("/status", (req, res) => {
   res.json({ timeLeft, isRunning, totalGifts, lastGifter, currentWinner });
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`🌐 Server running at http://localhost:${PORT}`);
   console.log(`📺 Overlay: http://localhost:${PORT}/overlay.html`);
