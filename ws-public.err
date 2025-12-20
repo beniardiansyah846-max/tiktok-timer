@@ -1,0 +1,11 @@
+ERROR Error: Unexpected server response: 502
+    at ClientRequest.<anonymous> (C:\Users\WIN 10\Documents\tiktok-timer\node_modules\ws\lib\websocket.js:913:7)
+    at ClientRequest.emit (node:events:508:28)
+    at HTTPParser.parserOnIncomingClient [as onIncoming] (node:_http_client:780:27)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:123:17)
+    at TLSSocket.socketOnData (node:_http_client:615:22)
+    at TLSSocket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at TLSWrap.onStreamRead (node:internal/stream_base_commons:189:23)
