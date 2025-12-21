@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Timer Control Panel</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <div class="panel">
+    <h1>TIMER CONTROL PANEL</h1>
+
+    <div class="section">
+      <button id="startBtn">START / RESET</button>
+      <button id="simulateBtn" style="background: #ff9800;">SIMULATE GIFT</button>
+    </div>
+
+    <div class="section">
+      <button class="mode-btn">Finger Heart</button>
+      <button class="mode-btn">Rose</button>
+    </div>
+
+    <div class="section" style="border: 2px solid #ff006e; padding: 15px; background: rgba(255,0,110,0.1);">
+      <h3 style="margin-top: 0; color: #ff006e;">🔴 TIKTOK LIVE CONNECTION</h3>
+      <div style="margin-bottom: 10px;">
+        <input type="text" id="tiktokUsername" placeholder="Masukkan username TikTok..." 
+               style="width: 70%; padding: 10px; font-size: 16px; border: 2px solid #444; background: #1a1d29; color: #fff; border-radius: 4px;">
+      </div>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="connectBtn" style="background: #00ff88; color: #000; flex: 1;">🔗 CONNECT</button>
+        <button id="disconnectBtn" style="background: #ff4444; color: #fff; flex: 1;">❌ DISCONNECT</button>
+      </div>
+      <div id="tiktokStatus" style="font-size: 18px; font-weight: bold; padding: 10px; background: #1a1d29; border-radius: 4px; text-align: center;">
+        ⚪ TIDAK TERHUBUNG
+      </div>
+    </div>
+
+    <div class="section status">
+      <p>Status: —</p>
+      <p>Time: --:--</p>
+      <p>Gift Mode: —</p>
+      <p>Last Gifter: — (0 gifts)</p>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

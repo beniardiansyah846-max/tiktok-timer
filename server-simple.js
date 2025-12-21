@@ -1,80 +1,78 @@
-const express = require("express");
-const http = require("http");
-const WebSocket = require("ws");
-const path = require("path");
+const express = require('express');
+const path = require('path');
 
+const PORT = process.env.PORT || 3000;
 const app = express();
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
 
-// Serve overlay
-app.use(express.static(path.join(__dirname, 'public')));
+// ==== Timer State (server is the only timekeeper) ====
+let remainingSeconds = 0;
+let running = false;
+let lastAddSeconds = 0;
+let activeGiftType = 'finger_heart';
 
-const START_TIME = 30;
-let timeLeft = START_TIME;
-let isRunning = false;
-let totalGifts = 0;
-let lastGifter = null;
-let currentWinner = null;
-
-wss.on('connection', (socket) => {
-  console.log('✅ Client connected');
-  socket.on('close', () => console.log('❌ Client disconnected'));
-  socket.on('error', (err) => console.error('WS error:', err));
-});
-
-function broadcast(event = 'tick') {
-  const payload = JSON.stringify({ timeLeft, isRunning, totalGifts, lastGifter, currentWinner, event });
-  wss.clients.forEach(ws => {
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(payload);
-    }
-  });
-}
-
+// Tick interval: decrement every second when running
 setInterval(() => {
-  if (!isRunning) return;
-  if (timeLeft > 0) {
-    timeLeft--;
-    if (timeLeft === 0) {
-      isRunning = false;
-      currentWinner = lastGifter;
-      broadcast('win');
-    } else {
-      broadcast('tick');
+  if (running && remainingSeconds > 0) {
+    remainingSeconds -= 1;
+    if (remainingSeconds === 0) {
+      running = false;
     }
   }
 }, 1000);
 
-app.get("/start", (req, res) => {
-  isRunning = true;
-  broadcast('tick');
-  res.send("OK");
+// Serve static files from /public
+app.use(express.static('public'));
+
+// Root serves index.html for convenience/health
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get("/reset", (req, res) => {
-  timeLeft = START_TIME;
-  isRunning = false;
-  currentWinner = null;
-  broadcast('tick');
-  res.send("OK");
+// ==== Timer endpoints ====
+// Start: set to 30s and run
+app.get('/start', (req, res) => {
+  remainingSeconds = 30;
+  running = true;
+  lastAddSeconds = 0;
+  res.json({ ok: true, running, remaining: remainingSeconds, lastAdd: lastAddSeconds });
 });
 
-app.get("/simulate-gift", (req, res) => {
-  const username = req.query.username || 'TestUser';
-  lastGifter = { username, avatarUrl: null };
-  totalGifts++;
-  timeLeft += 30;
-  broadcast('gift');
-  res.send("OK");
+// Status: report current state (then reset lastAdd)
+app.get('/status', (req, res) => {
+  const payload = { running, remaining: remainingSeconds, lastAdd: lastAddSeconds };
+  res.json(payload);
+  lastAddSeconds = 0;
 });
 
-app.get("/status", (req, res) => {
-  res.json({ timeLeft, isRunning, totalGifts, lastGifter, currentWinner });
+// Simulate gift: add +5s
+app.get('/simulate-gift', (req, res) => {
+  const type = String(req.query.type || '').toLowerCase();
+  
+  // Jika tidak ada type atau type kosong, gunakan activeGiftType
+  const giftType = type || activeGiftType;
+  
+  if (giftType === activeGiftType || !type) {
+    if (giftType === 'finger_heart' || giftType === 'rose') {
+      // Tambahkan 5 detik ke waktu yang tersisa
+      remainingSeconds += 5;
+      running = true;
+      lastAddSeconds = 5;
+    }
+  }
+  res.json({ ok: true, running, remaining: remainingSeconds, lastAdd: lastAddSeconds });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🌐 Server running at http://localhost:${PORT}`);
-  console.log(`📺 Overlay: http://localhost:${PORT}/overlay.html`);
+// Set active gift type (finger_heart | rose). Others ignored.
+app.get('/set-gift-type', (req, res) => {
+  const t = String(req.query.type || '').toLowerCase();
+  if (t === 'finger_heart' || t === 'rose') {
+    activeGiftType = t;
+    res.json({ ok: true, activeGiftType });
+  } else {
+    res.status(400).json({ ok: false, error: 'invalid type' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });

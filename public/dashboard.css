@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  height: 100vh;
+  background: #0f1115;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  color: #fff;
+}
+
+.panel {
+  background: #1c1f26;
+  padding: 30px;
+  border-radius: 12px;
+  width: 360px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.section {
+  margin: 15px 0;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.mode-btn {
+  background: #2a2e39;
+  color: #fff;
+}
+
+#startBtn {
+  background: #4caf50;
+  color: #000;
+}
+
+.status p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #ccc;
+}

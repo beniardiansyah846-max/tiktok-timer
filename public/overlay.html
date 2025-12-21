@@ -1,216 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>King Auction Overlay</title>
+  <title>Timer Overlay</title>
+  <link rel="stylesheet" href="/style.css" />
   <style>
-    :root {
-      --accent: #ffd35a; /* gold */
-      --accent-2: #00ff8a; /* neon green */
-      --text: #ffffff;
-      --danger: #ff3b3b;
-      --bg: transparent;
-      --avatar-size: 120px;
-      --timer-size: 120px;
-      --font: Inter, Arial, sans-serif;
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      font-family: var(--font);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .overlay {
-      width: 100%;
-      max-width: 480px;
+    /* Container overlay card */
+    .overlay-card {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
-      pointer-events: none; /* display-only */
+      gap: 8px;
+      pointer-events: none;
+      z-index: 9999;
+      background: transparent;
     }
-    /* Top: Avatar + crown */
+
+    /* Foto profil bulat */
     .avatar-wrap {
       position: relative;
-      width: var(--avatar-size);
-      height: calc(var(--avatar-size) + 18px);
-      display: flex;
-      justify-content: center;
+      width: 64px;
+      height: 64px;
     }
     .avatar {
-      width: var(--avatar-size);
-      height: var(--avatar-size);
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
       object-fit: cover;
-      box-shadow: 0 0 12px rgba(255, 211, 90, 0.5);
-      border: 3px solid rgba(255, 211, 90, 0.6);
+      display: block;
+      background: #ddd;
+      border: 2px solid rgba(0,0,0,0.1);
     }
     .crown {
       position: absolute;
       top: -6px;
-      width: 40px;
-      height: 24px;
-      filter: drop-shadow(0 0 6px rgba(255, 211, 90, 0.7));
+      left: 50%;
+      transform: translateX(-50%) rotate(-6deg);
+      font-size: 16px;
+      line-height: 1;
     }
-    .float { animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-6px)} }
 
     /* Username */
     .username {
-      font-weight: 800;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
       letter-spacing: 0.2px;
-      color: var(--text);
-      text-shadow: 0 0 8px rgba(255,255,255,0.25);
+      min-height: 18px;
+    }
+    .username.yellow { color: #ffd966; }
+
+    /* Gift display */
+    .gift-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #fff;
+    }
+    .gift-icon { font-size: 18px; }
+    .gift-count {
+      font-weight: 700;
+      font-family: inherit;
+      animation: pop-in 0.25s ease;
+    }
+    @keyframes pop-in {
+      0% { transform: scale(0.8); opacity: 0; }
+      60% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); }
     }
 
-    /* Middle: Gift info */
-    .gift-info { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .subtitle { font-size: 12px; letter-spacing: 1px; color: rgba(255,255,255,0.75); }
-    .gift-row { display: flex; align-items: center; gap: 10px; }
-    .gift-icon { width: 28px; height: 28px; }
-    .gift-count { font-weight: 700; font-size: 20px; color: var(--accent); text-shadow: 0 0 8px rgba(255, 211, 90, 0.4); }
-    .pop { animation: pop 400ms ease-out; }
-    @keyframes pop { 0%{ transform: scale(0.6); opacity: 0 } 60%{ transform: scale(1.2); opacity:1 } 100%{ transform: scale(1); opacity:1 } }
-
-    /* Bottom: Timer */
-    .timer {
-      font-size: var(--timer-size);
-      font-weight: 900;
-      line-height: 1;
-      color: var(--accent-2);
-      text-shadow: 0 0 14px rgba(0,255,138,0.6), 0 0 32px rgba(0,255,138,0.35);
+    /* Timer overlay */
+    .overlay-timer {
+      font-weight: 700;
+      font-size: 42px;
+      color: #ffd400;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
     }
-    .urgent { color: var(--danger); text-shadow: 0 0 12px rgba(255,59,59,0.8); }
-    .pulse { animation: pulse 800ms ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{ transform: scale(1) } 50%{ transform: scale(1.04) } }
-    .flash { animation: flash 600ms ease-out; }
-    @keyframes flash { 0%{ filter: drop-shadow(0 0 0 rgba(255,211,90,0)); } 50%{ filter: drop-shadow(0 0 16px rgba(255,211,90,0.9)); } 100%{ filter: drop-shadow(0 0 0 rgba(255,211,90,0)); } }
+    .overlay-timer.warn { color: #ffd400; }
+    .overlay-timer.critical { color: #ff4d4d; }
+    .timer-digits { display: inline-block; }
 
-    /* Confetti */
-    .confetti { position: absolute; inset: 0; pointer-events: none; }
-    .dot { position: absolute; width: 6px; height: 6px; border-radius: 50%; opacity: 0; }
-    @keyframes fall { 0%{ transform: translateY(-10px); opacity:0 } 20%{ opacity:1 } 100%{ transform: translateY(100vh); opacity:0 } }
+    /* Gift cues keep their position relative to timer */
+    .overlay-timer { position: relative; }
+    .reset-cue, .add-cue {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      z-index: 2;
+    }
+
+    /* Bar bawah / kolam */
+    .overlay-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 28px;
+      background: rgba(0,0,0,0.6);
+      border-top: 1px solid rgba(255, 215, 0, 0.8);
+      backdrop-filter: blur(2px);
+      pointer-events: none;
+      z-index: 9998;
+    }
   </style>
 </head>
-<body>
+<body class="overlay-body">
   <div class="overlay">
-    <!-- Top: Avatar + crown -->
-    <div class="avatar-wrap">
-      <svg class="crown" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M6 26 L12 10 L22 22 L32 6 L42 22 L52 10 L58 26 Z" fill="#ffd35a" stroke="#e6b94a" stroke-width="2" />
-      </svg>
-      <img id="avatar" class="avatar" src="" alt="avatar" />
-    </div>
-    <!-- Username -->
-    <div id="username" class="username">—</div>
-    <!-- Middle: Gift info -->
-    <div class="gift-info">
-      <div class="subtitle">GIFT TO BE KING</div>
-      <div class="gift-row">
-        <svg id="giftIcon" class="gift-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <path d="M32 54 C24 46,12 40,12 28 C12 20,18 16,24 16 C28 16,30 18,32 20 C34 18,36 16,40 16 C46 16,52 20,52 28 C52 40,40 46,32 54 Z" fill="#ff6aa9" />
-        </svg>
-        <div id="giftCount" class="gift-count">0</div>
+    <div id="overlay-card" class="overlay-card">
+      <div class="avatar-wrap">
+        <img id="avatar" class="avatar" src="" alt="Profil" />
+        <span class="crown" aria-label="crown">👑</span>
+      </div>
+
+      <div id="username" class="username">Nama Pengguna</div>
+
+      <div class="gift-display">
+        <div id="overlay-timer" class="overlay-timer timer-display" aria-label="timer">
+          <div id="resetCue" class="reset-cue" aria-live="polite">RESET!</div>
+          <div id="addCue" class="add-cue" aria-live="polite">+5s</div>
+          <span id="timer-digits" class="timer-digits">20</span>
+        </div>
+        <span id="gift-count" class="gift-count">1</span>
       </div>
     </div>
-    <!-- Bottom: Timer -->
-    <div id="timer" class="timer">00:30</div>
+    <div id="overlay-bar" class="overlay-bar" aria-hidden="true"></div>
   </div>
-  <div id="confetti" class="confetti"></div>
 
-  <script>
-    const params = new URLSearchParams(location.search);
-    // Support WS override for deployment use-cases
-    const overrideWs = params.get('ws');
-    const wsUrl = overrideWs || ((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host);
-    const ws = new WebSocket(wsUrl);
-
-    const avatarEl = document.getElementById('avatar');
-    const usernameEl = document.getElementById('username');
-    const giftIconEl = document.getElementById('giftIcon');
-    const giftCountEl = document.getElementById('giftCount');
-    const timerEl = document.getElementById('timer');
-    const confettiEl = document.getElementById('confetti');
-
-    let lastTimeLeft = null;
-
-    function fmt(seconds){
-      const m = Math.floor(seconds/60).toString().padStart(2,'0');
-      const s = Math.floor(seconds%60).toString().padStart(2,'0');
-      return `${m}:${s}`;
-    }
-
-    function makeConfetti(){
-      confettiEl.innerHTML = '';
-      const colors = ['#ffd35a','#fff','#00ff8a','#ff6aa9'];
-      for(let i=0;i<14;i++){
-        const d = document.createElement('div');
-        d.className = 'dot';
-        d.style.left = Math.round(Math.random()*100) + '%';
-        d.style.background = colors[i%colors.length];
-        d.style.animation = `fall ${1000 + Math.round(Math.random()*1200)}ms ease-out forwards`;
-        confettiEl.appendChild(d);
-      }
-    }
-
-    function updateWinnerState(currentWinner){
-      const crown = document.querySelector('.crown');
-      const wrap = document.querySelector('.avatar-wrap');
-      if(currentWinner && currentWinner.username){
-        crown.style.filter = 'drop-shadow(0 0 10px rgba(255, 211, 90, 0.95))';
-        wrap.classList.add('float');
-      } else {
-        crown.style.filter = 'drop-shadow(0 0 6px rgba(255, 211, 90, 0.7))';
-        wrap.classList.remove('float');
-      }
-    }
-
-    function handleGift(){
-      giftIconEl.classList.remove('pop');
-      void giftIconEl.offsetWidth; // reflow to restart animation
-      giftIconEl.classList.add('pop');
-      timerEl.classList.remove('flash');
-      void timerEl.offsetWidth;
-      timerEl.classList.add('flash');
-    }
-
-    ws.onopen = () => console.log('WS open', wsUrl);
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        const { timeLeft, totalGifts, lastGifter, currentWinner, event: ev } = data;
-        if(lastGifter){
-          usernameEl.textContent = lastGifter.username || '—';
-          if(lastGifter.avatarUrl){ avatarEl.src = lastGifter.avatarUrl; }
-        }
-        giftCountEl.textContent = totalGifts ?? 0;
-
-        // Timer and urgency state
-        timerEl.textContent = fmt(timeLeft ?? 0);
-        const urgent = (timeLeft ?? 0) <= 5 && (timeLeft ?? 0) > 0;
-        timerEl.classList.toggle('urgent', urgent);
-        timerEl.classList.toggle('pulse', urgent);
-
-        if(ev === 'gift'){ handleGift(); }
-        if(ev === 'win'){
-          updateWinnerState(currentWinner);
-          makeConfetti();
-        } else {
-          updateWinnerState(currentWinner);
-        }
-
-        lastTimeLeft = timeLeft;
-      } catch (e) {
-        console.error('Invalid WS message', e);
-      }
-    };
-    ws.onclose = (code) => console.log('WS closed', code);
-    ws.onerror = (e) => console.error('WS error', e);
-  </script>
+  <script src="/script.js"></script>
 </body>
 </html>

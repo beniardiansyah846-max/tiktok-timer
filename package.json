@@ -1,20 +1,20 @@
 {
-  "name": "tiktok-timer",
+  "name": "timeroscar",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "TikTok live timer overlay for Render",
+  "private": true,
+  "main": "server-tiktok.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server-simple.js"
+    "start": "node server-tiktok.js",
+    "simple": "node server-simple.js",
+    "tiktok": "node server-tiktok.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "express": "^5.2.1",
+    "express": "^4.19.2",
     "tiktok-live-connector": "^2.1.1-beta1",
     "ws": "^8.18.3"
-  },
-  "devDependencies": {}
+  }
 }

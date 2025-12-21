@@ -2,13 +2,13 @@
 
 ## Overview
 - Overlay file: `public/overlay.html` (WebSocket client)
-- Server: `server.js` (Express + WebSocket, optional TikTok integration)
+- Server: `server-simple.js` (Express + WebSocket minimal)
 - WebSocket URL is configurable via query param: `?ws=`
 
 ## Local Test
 ```powershell
 cd C:\Users\WIN 10\Documents\tiktok-timer
-node server.js
+node server-simple.js
 # Test endpoints
 Invoke-WebRequest -Uri http://localhost:3000/status -UseBasicParsing
 Invoke-WebRequest -Uri http://localhost:3000/start -UseBasicParsing
@@ -19,7 +19,7 @@ http://localhost:3000/overlay.html
 http://localhost:3000/overlay.html?ws=ws://localhost:3000
 ```
 
-## Deploy Overlay to Vercel
+## Deploy Overlay to Vercel (opsional)
 - Requirements: Vercel account, `vercel` CLI
 - Config: see `vercel.json` (serves `public/` as static)
 ```powershell
@@ -35,11 +35,10 @@ https://<project>.vercel.app/overlay.html?ws=wss://<your-service>.onrender.com
 
 ## Deploy Server to Render
 - Requirements: Render account
-- Config blueprint: `render.yaml`
 - Steps (Dashboard): New → Web Service → Connect repo
   - Build Command: `npm install`
   - Start Command: `npm start`
-  - Env Vars: `ENABLE_TIKTOK=false`, `TIKTOK_USERNAME=siscaa_x`
+  - Env Vars: (opsional) `ENABLE_TIKTOK=false`, `TIKTOK_USERNAME=siscaa_x`
 - Result: `https://<your-service>.onrender.com`
 - Test:
 ```powershell
@@ -55,6 +54,6 @@ https://<project>.vercel.app/overlay.html?ws=wss://<your-service>.onrender.com
 ```
 
 ## Notes
-- Server reads `PORT` from env; Render provides it automatically.
-- Set `ENABLE_TIKTOK=true` only when you intend to connect during a real live.
-- WebSocket over HTTPS requires `wss://`.
+- Server membaca `PORT` dari env; Render menyediakannya otomatis.
+- Set `ENABLE_TIKTOK=true` hanya saat konek ke TikTok Live sungguhan.
+- WebSocket di HTTPS menggunakan `wss://`.
