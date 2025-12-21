@@ -15,6 +15,7 @@
   "dependencies": {
     "express": "^4.19.2",
     "tiktok-live-connector": "^2.1.1-beta1",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "debug": "^4.3.4"
   }
 }
